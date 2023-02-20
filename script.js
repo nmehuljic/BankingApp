@@ -5,6 +5,9 @@
 // BANKIST APP
 
 // Data
+
+const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+
 const account1 = {
   owner: "Jonas Schmedtmann",
   movements: [200, 450, -400, 3000, -650, -130, 70, 1300],
@@ -60,3 +63,44 @@ const inputTransferAmount = document.querySelector(".form__input--amount");
 const inputLoanAmount = document.querySelector(".form__input--loan-amount");
 const inputCloseUsername = document.querySelector(".form__input--user");
 const inputClosePin = document.querySelector(".form__input--pin");
+
+const displayMowements = function (movements) {
+  containerMovements.innerHTML = "";
+
+  movements.forEach(function (mov, i) {
+    const type = mov > 0 ? "deposit" : "withdrawal";
+
+    const html = `<div class="movements__row">
+    <div class="movements__type movements__type--${type}">${
+      i + 1
+    } ${type}</div>>
+    <div class="movements__value">${mov}</div>
+  </div>`;
+
+    containerMovements.insertAdjacentHTML("afterbegin", html);
+  });
+};
+displayMowements(account1.movements);
+
+const calcDisplayBalance = function (movements) {
+  const balance = movements.reduce((acc, mov) => acc + mov, 0);
+  labelBalance.textContent = `${balance} €`;
+};
+calcDisplayBalance(account1.movements);
+
+const createUserNames = function (accs) {
+  accs.forEach(function (acc) {
+    acc.username = acc.owner
+      .toLocaleLowerCase()
+      .split(" ")
+      .map((word) => word[0])
+      .join("");
+  });
+};
+createUserNames(accounts);
+
+const max = movements.reduce((acc, mov) => {
+  if (acc > mov) return acc;
+  else return mov;
+}, movements[0]);
+console.log(max);
