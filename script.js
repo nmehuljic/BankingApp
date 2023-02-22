@@ -81,9 +81,9 @@ const displayMowements = function (movements) {
   });
 };
 
-const calcDisplayBalance = function (movements) {
-  const balance = movements.reduce((acc, mov) => acc + mov, 0);
-  labelBalance.textContent = `${balance} €`;
+const calcDisplayBalance = function (acc) {
+  acc.balance = acc.movements.reduce((acc, mov) => acc + mov, 0);
+  labelBalance.textContent = `${acc.balance} €`;
 };
 
 const createUserNames = function (accs) {
@@ -96,6 +96,14 @@ const createUserNames = function (accs) {
   });
 };
 createUserNames(accounts);
+
+const updateUI = function (acc) {
+  displayMowements(acc.movements);
+
+  calcDisplayBalance(acc);
+
+  calcDisplaySummary(acc);
+};
 
 const calcDisplaySummary = function (acc) {
   const incomes = acc.movements
@@ -135,11 +143,44 @@ btnLogin.addEventListener("click", function (e) {
 
     inputLoginUsername.value = inputLoginPin.value = "";
     inputLoginPin.blur();
-
-    displayMowements(currentAccount.movements);
-
-    calcDisplayBalance(currentAccount.movements);
-
-    calcDisplaySummary(currentAccount);
+    updateUI(currentAccount);
   }
+});
+
+btnTransfer.addEventListener("click", function (e) {
+  e.preventDefault();
+  const amount = Number(inputTransferAmount.value);
+  const receiverAcc = accounts.find(
+    (acc) => acc.username === inputTransferTo.value
+  );
+  inputTransferAmount.value = inputTransferTo.value = "";
+
+  if (
+    amount > 0 &&
+    receiverAcc &&
+    currentAccount.balance >= amount &&
+    receiverAcc?.username !== currentAccount.username
+  ) {
+    currentAccount.movements.push(-amount);
+    receiverAcc.movements.push(amount);
+    updateUI(currentAccount);
+  }
+});
+
+btnClose.addEventListener("click", function (e) {
+  e.preventDefault();
+
+  if (
+    inputCloseUsername.value === currentAccount.username &&
+    Number(inputClosePin.value) === currentAccount.pin
+  ) {
+    const index = accounts.findIndex(
+      (acc) => acc.username === currentAccount.username
+    );
+
+    accounts.splice(index, 1);
+    containerApp.style.opacity = 0;
+  }
+  inputCloseUsername.value = inputClosePin.value = "";
+  labelWelcome.textContent = `Login to get started`;
 });
